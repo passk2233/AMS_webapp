@@ -38,8 +38,7 @@ if (!$studentId || !$groupId) {
         // /evaluation-results request per plan (N sequential round-trips). Stays
         // live so a just-submitted evaluation flips to "done" on the next load.
         $mineByPlan = [];
-        foreach (api_list(api('GET', '/evaluation-results?student_id=' . (int) $studentId
-            . '&limit=1000')['data']) as $r) {
+        foreach (api_get_all('/evaluation-results?student_id=' . (int) $studentId) as $r) {
             $mineByPlan[(int) ($r['study_plan_id'] ?? 0)][] = $r;
         }
 

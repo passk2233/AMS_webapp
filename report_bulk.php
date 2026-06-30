@@ -17,9 +17,10 @@ if (count($planIds) === 0) {
     exit;
 }
 
-// Fetch all evaluation results once (limit high enough for bulk).
-$res = api('GET', '/evaluation-results?limit=5000');
-$allRows = $res['ok'] ? api_list($res['data']) : [];
+// Results for the requested plans only, every page (the API caps a page at 200
+// rows and ignores a bigger ?limit, so the old single ?limit=5000 fetch returned
+// only the first 200 rows — most reports came back empty for a large selection).
+$allRows = api_get_all('/evaluation-results?study_plan_ids=' . implode(',', $planIds));
 
 // Build the plan name map for the requested plans.
 $groups  = group_index();
@@ -46,12 +47,7 @@ foreach (api_list(cached_get('/evaluation-questions?limit=500', 86400)) as $q) {
     }
 }
 
-// Filter rows to only the requested plans.
-$filteredRows = array_filter($allRows, fn ($r) =>
-    in_array((int) ($r['study_plan_id'] ?? 0), $planIds, true)
-);
-
-$allReports = reports_from_rows(array_values($filteredRows), $planMap, $questionMap);
+$allReports = reports_from_rows($allRows, $planMap, $questionMap);
 
 // Sort reports in the same order as the requested plan IDs.
 $posMap = array_flip($planIds);

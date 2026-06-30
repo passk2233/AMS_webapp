@@ -9,21 +9,31 @@ if ($selectedSemId <= 0) {
     $selectedSemId = (int) (active_semester()['id'] ?? 0);
 }
 
-$res     = api('GET', '/evaluation-results?limit=1000');
-$error   = !$res['ok'];
 $reports = [];
 
+// Names + scope come from the selected semester's study plans.
+$planMap = [];
+$groups  = group_index();
+$plans   = study_plans($selectedSemId ?: null, null);
+warm_plan_group_counts($plans, $groups); // parallel roster fetch, not one-by-one
+foreach ($plans as $p) {
+    $planMap[(int) ($p['id'] ?? 0)] = plan_names($p, $groups);
+}
+
+// Results for exactly this semester's plans, every page. The API caps a page at
+// 200 rows and ignores a bigger ?limit, so the old single ?limit=1000 fetch saw
+// only the first 200 global rows (oldest first, across all semesters) — plans
+// past that showed a 0/- placeholder even though their evaluations existed.
+$planIds = array_values(array_filter(array_keys($planMap), fn ($id) => $id > 0));
+$ok      = true;
+$allRows = $planIds
+    ? api_get_all('/evaluation-results?study_plan_ids=' . implode(',', $planIds), $ok)
+    : [];
+$error   = !$ok;
+
 if (!$error) {
-    // Names + scope come from the selected semester's study plans.
-    $planMap = [];
-    $groups  = group_index();
-    $plans   = study_plans($selectedSemId ?: null, null);
-    warm_plan_group_counts($plans, $groups); // parallel roster fetch, not one-by-one
-    foreach ($plans as $p) {
-        $planMap[(int) ($p['id'] ?? 0)] = plan_names($p, $groups);
-    }
     $reportMap = [];
-    foreach (reports_from_rows(api_list($res['data']), $planMap) as $report) {
+    foreach (reports_from_rows($allRows, $planMap) as $report) {
         $reportMap[(int) $report['plan_id']] = $report;
     }
     // Only this semester's plans (placeholder when nobody has evaluated yet).

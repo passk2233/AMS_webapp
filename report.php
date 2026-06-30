@@ -8,7 +8,9 @@ if ($planId <= 0) {
     exit;
 }
 
-$rows = api_list(api('GET', '/evaluation-results?study_plan_id=' . $planId . '&limit=1000')['data']);
+// Every page: a large class can exceed the API's 200-row page cap, which would
+// otherwise drop answers and skew the averages.
+$rows = api_get_all('/evaluation-results?study_plan_id=' . $planId);
 
 // Real names from the plan (best-effort). /study-plans/{id} is empty in gateway
 // mode, so the plan is found in the translated list — same source as admin.php.

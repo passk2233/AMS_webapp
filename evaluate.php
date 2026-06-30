@@ -56,28 +56,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (count($questions) === 0 || count($missing) > 0) {
         $error = 'ກະລຸນາໃຫ້ຄະແນນຂໍ້ທີ່ໝາຍສີແດງກ່ອນສົ່ງ';
     } else {
-        // ponytail: non-atomic — one POST per question. A mid-loop failure can
-        // leave a partial record; true atomicity needs a batch endpoint on the
-        // Go API. The submit button is disabled client-side to stop double-taps,
-        // which is the common cause of duplicate/partial writes in practice.
-        $sent  = true;
-        $first = true;
+        // All answers in ONE atomic request — the Go API upserts them in a single
+        // transaction, so a retry can't leave a partial record.
+        $answers = [];
         foreach ($questions as $q) {
             $qid = (int) $q['eva_question_id'];
-            $res = api('POST', '/evaluation-results', [
-                'study_plan_id'  => $planId,
-                'student_id'     => $studentId,
-                'eva_question_id' => $qid,
-                'score'          => (int) $scores[$qid],
-                'comment'        => ($first && $comment !== '') ? $comment : null,
-            ]);
-            $first = false;
-            if (!$res['ok']) {
-                $sent = false;
-                break;
+            $answers[] = ['eva_question_id' => $qid, 'score' => (int) $scores[$qid]];
+        }
+        $res = api('POST', '/evaluation-results/batch', [
+            'study_plan_id' => $planId,
+            'student_id'    => $studentId,
+            'comment'       => $comment !== '' ? $comment : null,
+            'answers'       => $answers,
+        ]);
+
+        // Deployed API not yet carrying the batch route → fall back to the old
+        // one-POST-per-question loop so submissions keep working during the gap.
+        // ponytail: delete this fallback once api.phetsamone.xyz has /batch.
+        if (in_array($res['status'], [404, 405], true)) {
+            $res = ['ok' => true];
+            $first = true;
+            foreach ($questions as $q) {
+                $qid = (int) $q['eva_question_id'];
+                $res = api('POST', '/evaluation-results', [
+                    'study_plan_id'  => $planId,
+                    'student_id'     => $studentId,
+                    'eva_question_id' => $qid,
+                    'score'          => (int) $scores[$qid],
+                    'comment'        => ($first && $comment !== '') ? $comment : null,
+                ]);
+                $first = false;
+                if (!$res['ok']) {
+                    break;
+                }
             }
         }
-        if ($sent) {
+
+        if ($res['ok']) {
             $_SESSION['flash'] = 'ສົ່ງການປະເມີນ ' . $names['subject'] . ' ສຳເລັດ';
             header('Location: student.php');
             exit;

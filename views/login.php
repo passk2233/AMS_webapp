@@ -36,6 +36,8 @@
 
     <?php if ($error !== ''): ?>
       <div class="error"><?= esc($error) ?></div>
+    <?php elseif (isset($_GET['expired'])): ?>
+      <div class="error">ເຊດຊັນໝົດອາຍຸ ກະລຸນາເຂົ້າສູ່ລະບົບໃໝ່</div>
     <?php endif; ?>
 
     <button class="btn block" type="submit" data-busy="ກຳລັງເຂົ້າ...">ເຂົ້າສູ່ລະບົບ</button>
