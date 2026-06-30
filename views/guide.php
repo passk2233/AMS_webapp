@@ -17,7 +17,7 @@ $gif   = null;   // path for <img>
 foreach (['assets/guide.mp4' => 'video/mp4', 'assets/guide.webm' => 'video/webm'] as $path => $mime) {
     if (is_file(__DIR__ . '/../' . $path)) { $video = [$path, $mime]; break; }
 }
-if (!$video && is_file(__DIR__ . '/../assets/guide.gif')) {
+if (!$video && is_file(__DIR__ . '/../assets/guide.mp4')) {
     $gif = 'assets/guide.gif';
 }
 ?>
