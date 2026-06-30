@@ -39,7 +39,7 @@
     <?php endif; ?>
 
     <button class="btn block" type="submit" data-busy="ກຳລັງເຂົ້າ...">ເຂົ້າສູ່ລະບົບ</button>
-    <p class="muted small" style="text-align:center;margin-top:14px;">ນັກສຶກສາ ແລະ ອາຈານ: ໃຊ້ອີເມວເຂົ້າສູ່ລະບົບ</p>
+
   </form>
 </div>
 
