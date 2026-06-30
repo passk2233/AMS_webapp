@@ -15,14 +15,7 @@ require __DIR__ . '/layout/header.php';
   <?php
     // Filename: teacher + subject + class + date + semester.
     $sem = $sem ?? active_semester();
-    $semLabel = '';
-    if (is_array($sem)) {
-        // Best-effort: a readable semester name, else the academic year.
-        $semLabel = trim((string) ($sem['name'] ?? ''));
-        if ($semLabel === '' && !empty($sem['year'])) {
-            $semLabel = 'ສົກ' . $sem['year'];
-        }
-    }
+    $semLabel = semester_label($sem);
     $pdfParts = array_filter([
         $report['teacher'] ?? '',
         $report['subject'] ?? '',
