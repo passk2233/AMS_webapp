@@ -253,6 +253,34 @@ label.field > span { display: block; font-size: 13px; color: var(--muted); margi
   font-size: 12px; font-weight: 800; background: #eef2f7; color: var(--muted);
 }
 
+/* ── Download buttons (admin hierarchy) ──────────────────────────────────── */
+.teacher-actions,
+.subject-actions {
+  display: flex; align-items: center; gap: 10px;
+}
+.btn-dl {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid var(--line); border-radius: 8px; padding: 5px 12px;
+  background: #fff; color: var(--primary-fill); font: inherit; font-size: 12px;
+  font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.btn-dl:hover {
+  background: rgba(58,87,232,.08); border-color: var(--primary-fill);
+  box-shadow: 0 1px 4px rgba(58,87,232,.15);
+}
+.btn-dl:active { background: rgba(58,87,232,.14); }
+.btn-dl:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.btn-dl svg { flex: none; }
+
+/* ── Page break (bulk report PDF) ────────────────────────────────────────── */
+.page-break {
+  page-break-before: always; break-before: page;
+  height: 0; margin: 0; border: 0;
+}
+/* Add spacing between reports on screen */
+.page-break + .report { margin-top: 32px; }
+
 /* Score stepper */
 .score-stepper {
   display: flex; align-items: center; width: 100%; min-height: 54px; margin-top: 10px;
@@ -307,14 +335,47 @@ label.field > span { display: block; font-size: 13px; color: var(--muted); margi
 
 .actions { display: flex; gap: 10px; margin-bottom: 16px; }
 
+/* ── iPad / Tablet ───────────────────────────────────────────────────────── */
+@media (max-width: 820px) {
+  .report { padding: 18px; }
+  .report .head .f { flex: 1 1 100%; }
+  .admin-groups { gap: 10px; }
+  .teacher-heading { padding: 12px 40px 12px 14px; }
+  .subject-heading { padding: 10px 40px 10px 14px; }
+  .btn-dl-text { display: inline; }
+  .actions { flex-wrap: wrap; }
+  .actions .btn { flex: 1 1 auto; min-width: 0; }
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
 @media (max-width: 560px) {
   .topbar-in { align-items: flex-start; gap: 10px; flex-direction: column; }
   .topbar nav { flex-wrap: wrap; gap: 10px 14px; }
   .teacher-heading,
-  .subject-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .subject-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .teacher-actions,
+  .subject-actions { width: 100%; justify-content: space-between; }
   .admin-class-row { align-items: flex-start; }
   .completion-copy { align-items: flex-end; flex-direction: column; gap: 6px; }
   .completion-count { min-width: 0; }
+  /* Report responsive */
+  .report { padding: 14px; border-radius: 10px; }
+  .report .head { gap: 2px 12px; font-size: 13px; }
+  .report .head .f { flex: 1 1 100%; }
+  .report table { font-size: 12px; }
+  .report th, .report td { padding: 4px 6px; }
+  .report thead th:last-child { width: 80px; font-size: 11px; }
+  /* Horizontal scroll for wide tables */
+  .report-table-wrap {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    margin: 0 -14px; padding: 0 14px;
+  }
+  .report-table-wrap table { min-width: 480px; }
+  /* Full-width download buttons */
+  .actions { flex-direction: column; }
+  .actions .btn { width: 100%; }
+  .btn-dl { padding: 6px 10px; font-size: 11px; }
+  .btn-dl-text { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -398,7 +459,7 @@ label.field > span { display: block; font-size: 13px; color: var(--muted); margi
 .state .btn { margin-top: 12px; }
 
 @media print {
-  .topbar, .actions, .no-print, .nav-progress { display: none !important; }
+  .topbar, .actions, .no-print, .nav-progress, .btn-dl { display: none !important; }
   /* Keep the blue bands, header tint and score colours in the PDF — browsers
      drop backgrounds by default. */
   html, body {
@@ -419,4 +480,7 @@ label.field > span { display: block; font-size: 13px; color: var(--muted); margi
   .report tr.band { break-after: avoid; }
   .report tr.total { break-before: avoid; }
   .report .legend, .report .comments { break-inside: avoid; }
+  /* Bulk report page breaks */
+  .page-break { page-break-before: always; break-before: page; height: 0; margin: 0; }
+  .page-break + .report { margin-top: 0; }
 }

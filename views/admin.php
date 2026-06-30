@@ -32,17 +32,47 @@ require __DIR__ . '/layout/header.php';
   <p class="muted small">ອາຈານ → ວິຊາ → ຫ້ອງ → ຈຳນວນຄົນທີ່ປະເມີນ (<?= count($reports) ?>)</p>
   <div class="admin-groups">
   <?php foreach ($groups as $teacher => $teacherGroup): ?>
+    <?php
+      // Collect all plan IDs for this teacher.
+      $teacherPlanIds = [];
+      foreach ($teacherGroup['subjects'] as $subjectReports) {
+        foreach ($subjectReports as $r) {
+          $teacherPlanIds[] = (int) $r['plan_id'];
+        }
+      }
+    ?>
     <details class="teacher-group">
       <summary class="teacher-heading">
         <span class="teacher-title"><?= esc($teacher) ?></span>
-        <span class="teacher-meta"><?= count($teacherGroup['subjects']) ?> ວິຊາ</span>
+        <span class="teacher-actions">
+          <button class="btn-dl btn-dl-teacher" type="button"
+                  data-plan-ids="<?= esc(implode(',', $teacherPlanIds)) ?>"
+                  data-label="<?= esc($teacher) ?>"
+                  title="ດາວໂຫຼດ PDF ທຸກວິຊາຂອງອາຈານ">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="btn-dl-text">PDF ທັງໝົດ</span>
+          </button>
+          <span class="teacher-meta"><?= count($teacherGroup['subjects']) ?> ວິຊາ</span>
+        </span>
       </summary>
       <div class="teacher-body">
       <?php foreach ($teacherGroup['subjects'] as $subject => $subjectReports): ?>
+        <?php
+          $subjectPlanIds = array_map(fn ($r) => (int) $r['plan_id'], $subjectReports);
+        ?>
         <details class="subject-group">
           <summary class="subject-heading">
             <span class="subject-title"><?= esc($subject) ?></span>
-            <span class="subject-meta"><?= count($subjectReports) ?> ຫ້ອງ</span>
+            <span class="subject-actions">
+              <button class="btn-dl btn-dl-subject" type="button"
+                      data-plan-ids="<?= esc(implode(',', $subjectPlanIds)) ?>"
+                      data-label="<?= esc($teacher . ' ' . $subject) ?>"
+                      title="ດາວໂຫຼດ PDF ທຸກຫ້ອງຂອງວິຊານີ້">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span class="btn-dl-text">PDF</span>
+              </button>
+              <span class="subject-meta"><?= count($subjectReports) ?> ຫ້ອງ</span>
+            </span>
           </summary>
           <div class="class-list">
           <?php foreach ($subjectReports as $r): ?>
@@ -69,6 +99,23 @@ require __DIR__ . '/layout/header.php';
     </details>
   <?php endforeach; ?>
   </div>
+
+  <script>
+  (function () {
+    // Download buttons: navigate to bulk report page.
+    document.querySelectorAll('.btn-dl').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var ids   = btn.dataset.planIds || '';
+        var label = btn.dataset.label || '';
+        if (!ids) return;
+        window.location.href = 'report_bulk.php?plans=' + encodeURIComponent(ids)
+                             + '&label=' + encodeURIComponent(label);
+      });
+    });
+  })();
+  </script>
 <?php endif; ?>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>
