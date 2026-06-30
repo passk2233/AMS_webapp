@@ -1,0 +1,6 @@
+{
+  "files": ["partials/footer.php"],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}
