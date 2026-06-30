@@ -13,7 +13,7 @@ function active_semester(): ?array
     }
     $resolved = true;
 
-    $all = api_list(api('GET', '/semasters?limit=20')['data']);
+    $all = api_list(cached_get('/semasters?limit=20', 86400));
     if (!$all) {
         return $sem;
     }
@@ -40,7 +40,7 @@ function semesters(): array
     if ($list !== null) {
         return $list;
     }
-    $list = api_list(api('GET', '/semasters?limit=50')['data']);
+    $list = api_list(cached_get('/semasters?limit=50', 86400));
     usort($list, function ($a, $b) {
         $cmp = (int) ($b['year'] ?? 0) <=> (int) ($a['year'] ?? 0);
         return $cmp !== 0 ? $cmp : ((int) ($b['term'] ?? 0) <=> (int) ($a['term'] ?? 0));
@@ -84,7 +84,7 @@ function study_plans(?int $semesterId, ?int $groupId): array
     if ($semesterId) {
         $q .= '&semaster_id=' . $semesterId;
     }
-    return api_list(api('GET', '/study-plans?' . $q)['data']);
+    return api_list(cached_get('/study-plans?' . $q, 600));
 }
 
 function positive_int_or_null($value): ?int
@@ -165,7 +165,7 @@ function group_index(): array
         return $idx;
     }
     $idx = [];
-    foreach (api_list(api('GET', '/student-groups?limit=500')['data']) as $g) {
+    foreach (api_list(cached_get('/student-groups?limit=500', 86400)) as $g) {
         $id = (int) ($g['id'] ?? 0);
         if ($id > 0) {
             $idx[$id] = $g;
@@ -174,12 +174,50 @@ function group_index(): array
     return $idx;
 }
 
+/** Shared roster-count cache (group id → size), returned by reference so both
+ *  group_student_count() and warm_plan_group_counts() read/write the same store.
+ *  Hydrated once per request from a cross-request file cache. ponytail: file +
+ *  1-day TTL — rosters are stable within a semester; delete the file (or drop the
+ *  TTL) if you ever need same-day roster edits to show up. */
+function &group_count_cache(): array
+{
+    static $cache = null;
+    if ($cache === null) {
+        $cache = [];
+        $f = group_count_cache_file();
+        if (is_file($f) && time() - filemtime($f) < 86400) {
+            $saved = json_decode((string) file_get_contents($f), true);
+            if (is_array($saved)) {
+                foreach ($saved as $k => $v) {
+                    $cache[(int) $k] = (int) $v;
+                }
+            }
+        }
+    }
+    return $cache;
+}
+
+/** Path of the cross-request roster-count cache (override for tests via env). */
+function group_count_cache_file(): string
+{
+    return getenv('GROUP_COUNT_CACHE') ?: sys_get_temp_dir() . '/ams_group_counts.json';
+}
+
+/** Persist the in-memory roster counts so the next request skips the API.
+ *  ponytail: last-writer-wins, no atomic rename — fine for a count cache. */
+function persist_group_counts(): void
+{
+    $cache = &group_count_cache();
+    @file_put_contents(group_count_cache_file(), json_encode($cache), LOCK_EX);
+}
+
 /** Students in a group, counted from its roster. 0 if unknown. Cached per id.
  *  ponytail: one /students call per distinct group; if the group list returns a
- *  count field, student_group_size() reads it first and this never fires. */
+ *  count field, student_group_size() reads it first and this never fires. Call
+ *  warm_plan_group_counts() first to fill the cache in parallel and skip the call. */
 function group_student_count(int $groupId): int
 {
-    static $cache = [];
+    $cache = &group_count_cache();
     if ($groupId <= 0) {
         return 0;
     }
@@ -188,6 +226,66 @@ function group_student_count(int $groupId): int
         $cache[$groupId] = count($roster);
     }
     return $cache[$groupId];
+}
+
+/** Pre-warm group_student_count() for every group referenced by $plans, fetching
+ *  the rosters in parallel (curl_multi) instead of one-by-one — turns N sequential
+ *  ~700ms calls into one batch ≈ the slowest call. Groups whose size is already
+ *  known (cache or a count field on the group) are skipped. Call once before a
+ *  plan_names() loop. ponytail: parallel transport only, same per-group count();
+ *  becomes a no-op the day the group list carries a size field. */
+function warm_plan_group_counts(array $plans, array $groupIndex): void
+{
+    $cache = &group_count_cache();
+    $need = [];
+    foreach ($plans as $p) {
+        $g   = is_array($p['student_group'] ?? null) ? $p['student_group'] : [];
+        $gid = (int) ($g['id'] ?? $p['std_group_id'] ?? 0);
+        if ($gid <= 0 || isset($cache[$gid]) || isset($need[$gid])) {
+            continue;
+        }
+        if (student_group_size($groupIndex[$gid] ?? null) === null) {
+            $need[$gid] = true;
+        }
+    }
+    $ids = array_keys($need);
+    if (!$ids) {
+        return;
+    }
+
+    $mh      = curl_multi_init();
+    $handles = [];
+    $token   = $_SESSION['token'] ?? '';
+    foreach ($ids as $gid) {
+        $ch      = curl_init(API_BASE . '/student-groups/' . $gid . '/students?limit=500');
+        $headers = ['Accept: application/json'];
+        if ($token !== '') {
+            $headers[] = 'Authorization: Bearer ' . $token;
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => $headers,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT        => 25,
+        ]);
+        curl_multi_add_handle($mh, $ch);
+        $handles[$gid] = $ch;
+    }
+    do {
+        $status = curl_multi_exec($mh, $running);
+        if ($running) {
+            curl_multi_select($mh);
+        }
+    } while ($running && $status === CURLM_OK);
+
+    foreach ($handles as $gid => $ch) {
+        $raw         = curl_multi_getcontent($ch);
+        $cache[$gid] = count(api_list(json_decode((string) $raw, true)));
+        curl_multi_remove_handle($mh, $ch);
+        curl_close($ch);
+    }
+    curl_multi_close($mh);
+    persist_group_counts(); // next request reads counts from disk, skips the API
 }
 
 /** Teacher/subject/class names from a study plan's nested objects. $groupIndex

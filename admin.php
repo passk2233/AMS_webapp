@@ -17,7 +17,9 @@ if (!$error) {
     // Names + scope come from the selected semester's study plans.
     $planMap = [];
     $groups  = group_index();
-    foreach (study_plans($selectedSemId ?: null, null) as $p) {
+    $plans   = study_plans($selectedSemId ?: null, null);
+    warm_plan_group_counts($plans, $groups); // parallel roster fetch, not one-by-one
+    foreach ($plans as $p) {
         $planMap[(int) ($p['id'] ?? 0)] = plan_names($p, $groups);
     }
     $reportMap = [];

@@ -43,6 +43,45 @@ function api(string $method, string $path, ?array $body = null, bool $auth = tru
     ];
 }
 
+/**
+ * GET with a cross-request file cache, for stable reference data only
+ * (semesters, student-groups, study-plans). Returns the same shape as
+ * api()['data']. Live data (evaluation-results) must NOT go through here.
+ * ponytail: file cache keyed by path hash; on API error it serves a stale file
+ * rather than blanking the page. Clear /tmp/ams_get_* (or set GET_CACHE_DIR) to
+ * invalidate; tune freshness with the per-call $ttl.
+ */
+function cached_get(string $path, int $ttl)
+{
+    $dir = getenv('GET_CACHE_DIR') ?: sys_get_temp_dir();
+    $f   = $dir . '/ams_get_' . md5($path) . '.json';
+    if (is_file($f) && time() - filemtime($f) < $ttl) {
+        $hit = json_decode((string) file_get_contents($f), true);
+        if ($hit !== null) {
+            return $hit;
+        }
+    }
+    $res = api('GET', $path);
+    if ($res['ok']) {
+        @file_put_contents($f, json_encode($res['data']), LOCK_EX);
+        return $res['data'];
+    }
+    if (is_file($f)) { // API down → stale beats blank
+        $stale = json_decode((string) file_get_contents($f), true);
+        if ($stale !== null) {
+            return $stale;
+        }
+    }
+    return $res['data'];
+}
+
+/** Drop a cached_get() entry so the next read refetches (call after a mutation). */
+function cache_forget(string $path): void
+{
+    $dir = getenv('GET_CACHE_DIR') ?: sys_get_temp_dir();
+    @unlink($dir . '/ams_get_' . md5($path) . '.json');
+}
+
 /** Unwrap a list response: bare array or {"data":[...]}. */
 function api_list($data): array
 {

@@ -28,23 +28,30 @@ if (!$studentId || !$groupId) {
     } elseif (count(api_list($win['data'])) === 0) {
         $status = 'closed';
     } else {
-        $questions = api_list(api('GET', '/evaluation-questions?is_active=1')['data']);
+        $questions = api_list(cached_get('/evaluation-questions?is_active=1', 86400));
         $qCount    = count($questions);
         $sem       = active_semester();
         $plans     = study_plans($sem['id'] ?? null, (int) $groupId);
         $groups    = group_index();
 
+        // One call for all of this student's answers, then count per plan — was one
+        // /evaluation-results request per plan (N sequential round-trips). Stays
+        // live so a just-submitted evaluation flips to "done" on the next load.
+        $mineByPlan = [];
+        foreach (api_list(api('GET', '/evaluation-results?student_id=' . (int) $studentId
+            . '&limit=1000')['data']) as $r) {
+            $mineByPlan[(int) ($r['study_plan_id'] ?? 0)][] = $r;
+        }
+
         foreach ($plans as $p) {
             $planId = (int) ($p['id'] ?? 0);
-            $mine   = api_list(api('GET', '/evaluation-results?study_plan_id=' . $planId
-                . '&student_id=' . (int) $studentId . '&limit=200')['data']);
             $names  = plan_names($p, $groups);
             $targets[] = [
                 'id'      => $planId,
                 'teacher' => $names['teacher'],
                 'subject' => $names['subject'],
                 'class'   => $names['class'],
-                'done'    => $qCount > 0 && count($mine) >= $qCount,
+                'done'    => $qCount > 0 && count($mineByPlan[$planId] ?? []) >= $qCount,
             ];
         }
     }

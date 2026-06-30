@@ -21,7 +21,7 @@ if ($studentId <= 0) {
     }
 }
 
-$questions = api_list(api('GET', '/evaluation-questions?is_active=1')['data']);
+$questions = api_list(cached_get('/evaluation-questions?is_active=1', 86400));
 
 // Plan header info (best-effort) — fetched up front so it's available for the
 // success flash and for re-rendering the form after a validation error.

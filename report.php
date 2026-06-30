@@ -25,7 +25,7 @@ foreach (study_plans($sem['id'] ?? null, null) as $p) {
 // Real question text + category (and canonical order). Result rows don't embed
 // the eva_question object, so without this the report shows "ຄຳຖາມ #id"/"ອື່ນໆ".
 $questionMap = [];
-foreach (api_list(api('GET', '/evaluation-questions?limit=500')['data']) as $q) {
+foreach (api_list(cached_get('/evaluation-questions?limit=500', 86400)) as $q) {
     $qid = (int) ($q['eva_question_id'] ?? 0);
     if ($qid > 0) {
         $questionMap[$qid] = [

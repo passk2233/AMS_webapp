@@ -25,16 +25,18 @@ $allRows = $res['ok'] ? api_list($res['data']) : [];
 $groups  = group_index();
 $sem     = active_semester();
 $planMap = [];
-foreach (study_plans($sem['id'] ?? null, null) as $p) {
-    $pid = (int) ($p['id'] ?? 0);
-    if (in_array($pid, $planIds, true)) {
-        $planMap[$pid] = plan_names($p, $groups);
-    }
+$wanted  = array_values(array_filter(
+    study_plans($sem['id'] ?? null, null),
+    fn ($p) => in_array((int) ($p['id'] ?? 0), $planIds, true)
+));
+warm_plan_group_counts($wanted, $groups); // parallel roster fetch, not one-by-one
+foreach ($wanted as $p) {
+    $planMap[(int) ($p['id'] ?? 0)] = plan_names($p, $groups);
 }
 
 // Real question text + category.
 $questionMap = [];
-foreach (api_list(api('GET', '/evaluation-questions?limit=500')['data']) as $q) {
+foreach (api_list(cached_get('/evaluation-questions?limit=500', 86400)) as $q) {
     $qid = (int) ($q['eva_question_id'] ?? 0);
     if ($qid > 0) {
         $questionMap[$qid] = [
