@@ -127,6 +127,13 @@ label.field > span { display: block; font-size: 13px; color: var(--muted); margi
 /* Section category heading (student form + questions admin) */
 .cat-head { color: var(--primary-fill); font-size: 15px; margin: 16px 4px 6px; }
 
+/* Questions admin: list row with inline actions */
+.q-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.q-row .grow { flex: 1 1 240px; min-width: 0; }
+.q-actions { display: flex; gap: 8px; flex: none; margin-left: auto; }
+.q-actions form { margin: 0; }
+.q-actions .btn { white-space: nowrap; padding: 8px 14px; min-height: 40px; }
+
 /* Guide: pre-assessment intro page */
 .guide-hero h1 { font-size: 20px; }
 .guide-hero p { margin: 6px 0 0; }

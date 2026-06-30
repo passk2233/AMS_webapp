@@ -32,23 +32,24 @@ require __DIR__ . '/layout/header.php';
   <?php foreach ($byCat[$c] as $q):
       $qid = (int) $q['eva_question_id'];
       $active = (int) ($q['is_active'] ?? 1) === 1; ?>
-    <div class="card" style="display:flex;align-items:flex-start;gap:10px;">
-      <div class="grow" style="<?= $active ? '' : 'opacity:.5;' ?>"><?= esc($q['question']) ?></div>
-      <form method="post" action="questions.php" style="margin:0;">
-        <input type="hidden" name="action" value="toggle">
-        <input type="hidden" name="id" value="<?= $qid ?>">
-        <input type="hidden" name="question" value="<?= esc($q['question']) ?>">
-        <input type="hidden" name="category" value="<?= esc($q['category'] ?? '') ?>">
-        <input type="hidden" name="is_active" value="<?= $active ? 0 : 1 ?>">
-        <button class="btn ghost" type="submit" title="ເປີດ/ປິດໃຊ້ງານ"><?= $active ? 'ປິດໃຊ້ງານ' : 'ເປີດໃຊ້ງານ' ?></button>
-      </form>
-      <a class="btn ghost" href="questions.php?edit=<?= $qid ?>">ແກ້</a>
-      <form method="post" action="questions.php" style="margin:0;"
-            onsubmit="return confirm('ລຶບຄຳຖາມນີ້?');">
-        <input type="hidden" name="action" value="delete">
-        <input type="hidden" name="id" value="<?= $qid ?>">
-        <button class="btn danger" type="submit">ລຶບ</button>
-      </form>
+    <div class="card q-row">
+      <div class="grow"<?= $active ? '' : ' style="opacity:.5;"' ?>><?= esc($q['question']) ?></div>
+      <div class="q-actions">
+        <form method="post" action="questions.php">
+          <input type="hidden" name="action" value="toggle">
+          <input type="hidden" name="id" value="<?= $qid ?>">
+          <input type="hidden" name="question" value="<?= esc($q['question']) ?>">
+          <input type="hidden" name="category" value="<?= esc($q['category'] ?? '') ?>">
+          <input type="hidden" name="is_active" value="<?= $active ? 0 : 1 ?>">
+          <button class="btn ghost" type="submit" title="ເປີດ/ປິດໃຊ້ງານ"><?= $active ? 'ປິດໃຊ້ງານ' : 'ເປີດໃຊ້ງານ' ?></button>
+        </form>
+        <a class="btn ghost" href="questions.php?edit=<?= $qid ?>">ແກ້</a>
+        <form method="post" action="questions.php" onsubmit="return confirm('ລຶບຄຳຖາມນີ້?');">
+          <input type="hidden" name="action" value="delete">
+          <input type="hidden" name="id" value="<?= $qid ?>">
+          <button class="btn danger" type="submit">ລຶບ</button>
+        </form>
+      </div>
     </div>
   <?php endforeach; ?>
 <?php endforeach; ?>
