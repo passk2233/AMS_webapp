@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ], false);
 
         if ($r['status'] === 200 && !empty($r['data']['token'])) {
+            session_regenerate_id(true); // fresh id on login → defeats session fixation
             $_SESSION['token'] = $r['data']['token'];
             if (load_me()) {
                 header('Location: ' . ($_SESSION['role'] === 'admin' ? 'admin.php' : 'student.php'));

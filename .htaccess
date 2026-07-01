@@ -1,0 +1,15 @@
+# Only the *.php controllers in this folder are meant to be reached over HTTP.
+# Everything else (docs, tests, and the require()-d model/view internals) is
+# served from disk by PHP, never fetched directly — so block direct access.
+
+# Docs: no rewrite module needed for this to hold.
+<FilesMatch "\.(md)$">
+    Require all denied
+</FilesMatch>
+
+# Internal directories. Guarded so the app still works if mod_rewrite is off
+# (the .md block above stays effective regardless).
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(models|views|tests|\.impeccable)/ - [F]
+</IfModule>
