@@ -13,3 +13,20 @@
     RewriteEngine On
     RewriteRule ^(models|views|tests|\.impeccable)/ - [F]
 </IfModule>
+
+# ── Speed ────────────────────────────────────────────────────────────────────
+# Compress text responses (the rendered HTML pages included).
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript
+</IfModule>
+
+# Cache static assets in the browser so repeat page loads only fetch the HTML.
+# style.css is safe to cache long: header.php appends ?v=<filemtime> as a buster.
+# The JS/media files effectively never change; a week keeps updates possible.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType image/gif "access plus 1 week"
+    ExpiresByType video/mp4 "access plus 1 week"
+</IfModule>

@@ -20,6 +20,7 @@
       <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
         <a href="admin.php">ຜົນການປະເມີນ</a>
         <a href="questions.php">ຄຳຖາມ</a>
+        <a href="window.php">ໄລຍະປະເມີນ</a>
       <?php else: ?>
         <a href="student.php">ວິຊາ</a>
         <a href="guide.php">ຄູ່ມືການໃຊ້</a>

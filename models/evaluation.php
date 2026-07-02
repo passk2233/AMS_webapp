@@ -71,6 +71,10 @@ function study_year_name(string $name): string
     }
     return preg_replace_callback('/ປີ\s*(\d{4})/u', function ($m) use ($year) {
         $level = $year - (int) $m[1] + 1;
+        // ponytail: 4-year program hardcoded; past year 4 the student has graduated
+        if ($level > 4) {
+            return 'ຈົບແລ້ວ (ປີ ' . $m[1] . ')';
+        }
         return 'ປີ ' . ($level >= 1 ? $level : 1);
     }, $name);
 }
@@ -248,43 +252,16 @@ function warm_plan_group_counts(array $plans, array $groupIndex): void
             $need[$gid] = true;
         }
     }
-    $ids = array_keys($need);
-    if (!$ids) {
+    $paths = [];
+    foreach (array_keys($need) as $gid) {
+        $paths[$gid] = '/student-groups/' . $gid . '/students?limit=500';
+    }
+    if (!$paths) {
         return;
     }
-
-    $mh      = curl_multi_init();
-    $handles = [];
-    $token   = $_SESSION['token'] ?? '';
-    foreach ($ids as $gid) {
-        $ch      = curl_init(API_BASE . '/student-groups/' . $gid . '/students?limit=500');
-        $headers = ['Accept: application/json'];
-        if ($token !== '') {
-            $headers[] = 'Authorization: Bearer ' . $token;
-        }
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => $headers,
-            CURLOPT_CONNECTTIMEOUT => 10,
-            CURLOPT_TIMEOUT        => 25,
-        ]);
-        curl_multi_add_handle($mh, $ch);
-        $handles[$gid] = $ch;
+    foreach (api_multi_get($paths) as $gid => $data) {
+        $cache[$gid] = count(api_list($data));
     }
-    do {
-        $status = curl_multi_exec($mh, $running);
-        if ($running) {
-            curl_multi_select($mh);
-        }
-    } while ($running && $status === CURLM_OK);
-
-    foreach ($handles as $gid => $ch) {
-        $raw         = curl_multi_getcontent($ch);
-        $cache[$gid] = count(api_list(json_decode((string) $raw, true)));
-        curl_multi_remove_handle($mh, $ch);
-        curl_close($ch);
-    }
-    curl_multi_close($mh);
     persist_group_counts(); // next request reads counts from disk, skips the API
 }
 
