@@ -161,11 +161,11 @@ function api_multi_get(array $paths, ?array &$status = null): array
         $handles[$key] = $ch;
     }
     do {
-        $status = curl_multi_exec($mh, $running);
+        $mrc = curl_multi_exec($mh, $running);
         if ($running) {
             curl_multi_select($mh);
         }
-    } while ($running && $status === CURLM_OK);
+    } while ($running && $mrc === CURLM_OK);
 
     $out = [];
     foreach ($handles as $key => $ch) {
