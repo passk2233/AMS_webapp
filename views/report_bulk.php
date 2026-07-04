@@ -3,7 +3,7 @@
 require __DIR__ . '/layout/header.php';
 ?>
 <div class="actions">
-  <a class="btn ghost" href="admin.php">‹ ກັບຄືນ</a>
+  <a class="btn ghost" href="<?= url('admin') ?>">‹ ກັບຄືນ</a>
   <?php if (count($allReports) > 0): ?><button class="btn" id="dl-pdf-bulk" type="button" data-busy="ກຳລັງສ້າງ PDF...">ດາວໂຫຼດ PDF (<?= count($allReports) ?> ລາຍງານ)</button><?php endif; ?>
 </div>
 
@@ -17,7 +17,7 @@ require __DIR__ . '/layout/header.php';
     <?php endforeach; ?>
   </div>
 
-  <script src="assets/html2pdf.bundle.min.js"></script>
+  <script src="<?= url('assets/html2pdf.bundle.min.js') ?>"></script>
   <script>
   (function () {
     var btn  = document.getElementById('dl-pdf-bulk');

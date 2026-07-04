@@ -3,7 +3,7 @@
 require __DIR__ . '/layout/header.php';
 ?>
 <div class="actions">
-  <a class="btn ghost" href="admin.php">‹ ກັບຄືນ</a>
+  <a class="btn ghost" href="<?= url('admin') ?>">‹ ກັບຄືນ</a>
   <?php if ($report): ?><button class="btn" id="dl-pdf" type="button" data-busy="ກຳລັງສ້າງ PDF...">ດາວໂຫຼດ PDF</button><?php endif; ?>
 </div>
 
@@ -26,7 +26,7 @@ require __DIR__ . '/layout/header.php';
     // Collapse any stray/double spaces (some source fields have trailing spaces).
     $pdfName = trim((string) preg_replace('/\s+/u', ' ', implode(' ', $pdfParts)));
   ?>
-  <script src="assets/html2pdf.bundle.min.js"></script>
+  <script src="<?= url('assets/html2pdf.bundle.min.js') ?>"></script>
   <script>
   (function () {
     var btn  = document.getElementById('dl-pdf');

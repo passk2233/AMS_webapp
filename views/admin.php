@@ -76,7 +76,7 @@ require __DIR__ . '/layout/header.php';
           </summary>
           <div class="class-list">
           <?php foreach ($subjectReports as $r): ?>
-            <a class="admin-class-row" href="report.php?plan=<?= $r['plan_id'] ?>">
+            <a class="admin-class-row" href="<?= url('admin/report') ?>?plan=<?= $r['plan_id'] ?>">
               <div class="class-copy">
                 <div class="class-name"><?= esc($r['class'] !== '' ? $r['class'] : '-') ?></div>
                 <div class="completion-meter" aria-hidden="true">
@@ -110,7 +110,7 @@ require __DIR__ . '/layout/header.php';
         var ids   = btn.dataset.planIds || '';
         var label = btn.dataset.label || '';
         if (!ids) return;
-        window.location.href = 'report_bulk.php?plans=' + encodeURIComponent(ids)
+        window.location.href = '<?= url('admin/report-bulk') ?>?plans=' + encodeURIComponent(ids)
                              + '&label=' + encodeURIComponent(label);
       });
     });

@@ -5,7 +5,7 @@ require_student();
 $studentId = (int) ($_SESSION['student_id'] ?? 0);
 $planId    = (int) ($_GET['plan'] ?? $_POST['plan'] ?? 0);
 if ($planId <= 0) {
-    header('Location: student.php');
+    header('Location: ' . url('student'));
     exit;
 }
 
@@ -16,7 +16,7 @@ if ($studentId <= 0) {
     load_me();
     $studentId = (int) ($_SESSION['student_id'] ?? 0);
     if ($studentId <= 0) {
-        header('Location: student.php');
+        header('Location: ' . url('student'));
         exit;
     }
 }
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($res['ok']) {
             $_SESSION['flash'] = 'ສົ່ງການປະເມີນ ' . $names['subject'] . ' ສຳເລັດ';
-            header('Location: student.php');
+            header('Location: ' . url('student'));
             exit;
         }
         $error = 'ສົ່ງການປະເມີນບໍ່ສຳເລັດ ກະລຸນາລອງໃໝ່';

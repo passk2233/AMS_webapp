@@ -9,23 +9,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=<?= @filemtime(__DIR__ . '/../../assets/style.css') ?: '1' ?>">
+<link rel="stylesheet" href="<?= url('assets/style.css') ?>?v=<?= @filemtime(__DIR__ . '/../../assets/style.css') ?: '1' ?>">
 </head>
 <body>
-<?php $home = (($_SESSION['role'] ?? '') === 'admin') ? 'admin.php' : 'student.php'; ?>
+<?php $home = url((($_SESSION['role'] ?? '') === 'admin') ? 'admin' : 'student'); ?>
 <header class="topbar">
   <div class="topbar-in">
     <a class="brand" href="<?= $home ?>">ການປະເມີນອາຈານ</a>
     <nav>
       <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-        <a href="admin.php">ຜົນການປະເມີນ</a>
-        <a href="questions.php">ຄຳຖາມ</a>
-        <a href="window.php">ໄລຍະປະເມີນ</a>
+        <a href="<?= url('admin') ?>">ຜົນການປະເມີນ</a>
+        <a href="<?= url('admin/questions') ?>">ຄຳຖາມ</a>
+        <a href="<?= url('admin/window') ?>">ໄລຍະປະເມີນ</a>
       <?php else: ?>
-        <a href="student.php">ວິຊາ</a>
-        <a href="guide.php">ຄູ່ມືການໃຊ້</a>
+        <a href="<?= url('student') ?>">ວິຊາ</a>
+        <a href="<?= url('student/guide') ?>">ຄູ່ມືການໃຊ້</a>
       <?php endif; ?>
-      <a href="logout.php" class="logout">ອອກຈາກລະບົບ</a>
+      <a href="<?= url('logout') ?>" class="logout">ອອກຈາກລະບົບ</a>
     </nav>
   </div>
 </header>

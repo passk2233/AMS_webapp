@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // copies so the edit shows up immediately instead of after the TTL.
     cache_forget('/evaluation-questions?limit=500');
     cache_forget('/evaluation-questions?is_active=1');
-    header('Location: questions.php');
+    header('Location: ' . url('admin/questions'));
     exit;
 }
 

@@ -5,7 +5,7 @@ require_admin();
 // Accept comma-separated plan IDs, e.g. ?plans=1,2,3
 $raw = trim((string) ($_GET['plans'] ?? ''));
 if ($raw === '') {
-    header('Location: admin.php');
+    header('Location: ' . url('admin'));
     exit;
 }
 $planIds = array_values(array_unique(array_filter(
@@ -13,7 +13,7 @@ $planIds = array_values(array_unique(array_filter(
     fn ($id) => $id > 0
 )));
 if (count($planIds) === 0) {
-    header('Location: admin.php');
+    header('Location: ' . url('admin'));
     exit;
 }
 

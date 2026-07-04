@@ -12,6 +12,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^(models|views|tests|\.impeccable)/ - [F]
+
+    # Clean URLs (student/eval, admin/report, …): anything that isn't a real
+    # file goes through the index.php front controller, which owns the routes.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule . index.php [L]
 </IfModule>
 
 # ── Speed ────────────────────────────────────────────────────────────────────

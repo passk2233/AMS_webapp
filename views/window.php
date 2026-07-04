@@ -21,7 +21,7 @@ $fmt = fn (?string $t): string => $t ? date('d/m/Y H:i', strtotime($t)) : '-';
         ເປີດ: <?= esc($fmt($current['open_time'] ?? null)) ?> ·
         ປິດ: <?= esc($fmt($current['close_time'] ?? null)) ?>
       </p>
-      <form method="post" action="window.php" onsubmit="return confirm('ປິດໄລຍະການປະເມີນປະຈຸບັນແທ້ບໍ?');">
+      <form method="post" action="<?= url('admin/window') ?>" onsubmit="return confirm('ປິດໄລຍະການປະເມີນປະຈຸບັນແທ້ບໍ?');">
         <input type="hidden" name="action" value="close">
         <input type="hidden" name="id" value="<?= (int) ($current['id'] ?? 0) ?>">
         <button class="btn danger" type="submit">ປິດການປະເມີນ</button>
@@ -35,14 +35,14 @@ $fmt = fn (?string $t): string => $t ? date('d/m/Y H:i', strtotime($t)) : '-';
   <div class="card">
     <?php if ($teacherVisible): ?>
       <p><strong style="color:#0c7a3c;">● ເປີດເຜີຍຢູ່</strong> — ອາຈານເຫັນຜົນການປະເມີນຂອງຕົນເອງໄດ້</p>
-      <form method="post" action="window.php" onsubmit="return confirm('ປິດການເຜີຍຜົນຈາກອາຈານແທ້ບໍ?');">
+      <form method="post" action="<?= url('admin/window') ?>" onsubmit="return confirm('ປິດການເຜີຍຜົນຈາກອາຈານແທ້ບໍ?');">
         <input type="hidden" name="action" value="visibility">
         <input type="hidden" name="visible" value="0">
         <button class="btn danger" type="submit">ປິດການເຜີຍຜົນ</button>
       </form>
     <?php else: ?>
       <p><strong style="color:var(--danger);">● ປິດຢູ່</strong> — ອາຈານຍັງເບິ່ງຜົນການປະເມີນບໍ່ໄດ້</p>
-      <form method="post" action="window.php">
+      <form method="post" action="<?= url('admin/window') ?>">
         <input type="hidden" name="action" value="visibility">
         <input type="hidden" name="visible" value="1">
         <button class="btn" type="submit">ເປີດເຜີຍຜົນໃຫ້ອາຈານ</button>
@@ -52,7 +52,7 @@ $fmt = fn (?string $t): string => $t ? date('d/m/Y H:i', strtotime($t)) : '-';
 
   <?php if (!$isOpen): ?>
     <h2>ເປີດການປະເມີນ</h2>
-    <form class="card" method="post" action="window.php">
+    <form class="card" method="post" action="<?= url('admin/window') ?>">
       <input type="hidden" name="action" value="open">
       <label class="field">
         <span>ເວລາເປີດ</span>

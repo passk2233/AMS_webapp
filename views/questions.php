@@ -6,7 +6,7 @@ require __DIR__ . '/layout/header.php';
   <div class="banner ok flash" role="status">✓ <?= esc($flash) ?></div>
 <?php endif; ?>
 <h1><?= $edit ? 'ແກ້ໄຂຄຳຖາມ' : 'ເພີ່ມຄຳຖາມ' ?></h1>
-<form class="card" method="post" action="questions.php">
+<form class="card" method="post" action="<?= url('admin/questions') ?>">
   <input type="hidden" name="action" value="<?= $edit ? 'update' : 'create' ?>">
   <?php if ($edit): ?><input type="hidden" name="id" value="<?= (int) $edit['eva_question_id'] ?>"><?php endif; ?>
   <label class="field">
@@ -23,7 +23,7 @@ require __DIR__ . '/layout/header.php';
   </label>
   <div class="actions" style="margin:0;">
     <button class="btn" type="submit"><?= $edit ? 'ບັນທຶກ' : 'ເພີ່ມ' ?></button>
-    <?php if ($edit): ?><a class="btn ghost" href="questions.php">ຍົກເລີກ</a><?php endif; ?>
+    <?php if ($edit): ?><a class="btn ghost" href="<?= url('admin/questions') ?>">ຍົກເລີກ</a><?php endif; ?>
   </div>
 </form>
 
@@ -35,7 +35,7 @@ require __DIR__ . '/layout/header.php';
     <div class="card q-row">
       <div class="grow"<?= $active ? '' : ' style="opacity:.5;"' ?>><?= esc($q['question']) ?></div>
       <div class="q-actions">
-        <form method="post" action="questions.php">
+        <form method="post" action="<?= url('admin/questions') ?>">
           <input type="hidden" name="action" value="toggle">
           <input type="hidden" name="id" value="<?= $qid ?>">
           <input type="hidden" name="question" value="<?= esc($q['question']) ?>">
@@ -43,8 +43,8 @@ require __DIR__ . '/layout/header.php';
           <input type="hidden" name="is_active" value="<?= $active ? 0 : 1 ?>">
           <button class="btn ghost" type="submit" title="ເປີດ/ປິດໃຊ້ງານ"><?= $active ? 'ປິດໃຊ້ງານ' : 'ເປີດໃຊ້ງານ' ?></button>
         </form>
-        <a class="btn ghost" href="questions.php?edit=<?= $qid ?>">ແກ້</a>
-        <form method="post" action="questions.php" onsubmit="return confirm('ລຶບຄຳຖາມນີ້?');">
+        <a class="btn ghost" href="<?= url('admin/questions') ?>?edit=<?= $qid ?>">ແກ້</a>
+        <form method="post" action="<?= url('admin/questions') ?>" onsubmit="return confirm('ລຶບຄຳຖາມນີ້?');">
           <input type="hidden" name="action" value="delete">
           <input type="hidden" name="id" value="<?= $qid ?>">
           <button class="btn danger" type="submit">ລຶບ</button>

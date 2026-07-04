@@ -5,7 +5,7 @@ declare(strict_types=1);
 function require_login(): void
 {
     if (empty($_SESSION['token'])) {
-        header('Location: login.php');
+        header('Location: ' . url('login'));
         exit;
     }
 }
@@ -13,7 +13,7 @@ function require_admin(): void
 {
     require_login();
     if (($_SESSION['role'] ?? '') !== 'admin') {
-        header('Location: login.php');
+        header('Location: ' . url('login'));
         exit;
     }
 }
@@ -21,7 +21,7 @@ function require_student(): void
 {
     require_login();
     if (($_SESSION['role'] ?? '') !== 'student') {
-        header('Location: login.php');
+        header('Location: ' . url('login'));
         exit;
     }
 }

@@ -42,11 +42,11 @@ if (!$video && is_file(__DIR__ . '/../assets/guide.mp4')) {
 <div class="card">
   <?php if ($video): ?>
     <video class="guide-video" controls preload="metadata" playsinline>
-      <source src="<?= esc($video[0]) ?>" type="<?= esc($video[1]) ?>">
+      <source src="<?= esc(url($video[0])) ?>" type="<?= esc($video[1]) ?>">
       ໂປຣແກຣມຂອງທ່ານບໍ່ຮອງຮັບການຫຼິ້ນວິດີໂອ
     </video>
   <?php elseif ($gif): ?>
-    <img class="guide-video" src="<?= esc($gif) ?>" alt="ວິດີໂອແນະນຳການນຳໃຊ້ການປະເມີນ" loading="lazy">
+    <img class="guide-video" src="<?= esc(url($gif)) ?>" alt="ວິດີໂອແນະນຳການນຳໃຊ້ການປະເມີນ" loading="lazy">
   <?php else: ?>
     <div class="guide-video placeholder" role="note">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -60,9 +60,9 @@ if (!$video && is_file(__DIR__ . '/../assets/guide.mp4')) {
 </div>
 
 <?php if (!empty($planId)): ?>
-  <a class="btn block" href="evaluate.php?plan=<?= $planId ?>">ເລີ່ມການປະເມີນ ›</a>
+  <a class="btn block" href="<?= url('student/eval') ?>?plan=<?= $planId ?>">ເລີ່ມການປະເມີນ ›</a>
 <?php else: ?>
-  <a class="btn block" href="student.php">ເລີ່ມການປະເມີນ ›</a>
+  <a class="btn block" href="<?= url('student') ?>">ເລີ່ມການປະເມີນ ›</a>
 <?php endif; ?>
 
 <?php require __DIR__ . '/layout/footer.php'; ?>

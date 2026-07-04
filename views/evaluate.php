@@ -4,10 +4,10 @@ require __DIR__ . '/layout/header.php';
 $missing = $missing ?? [];
 ?>
 <div class="actions">
-  <a class="btn ghost" href="student.php">‹ ກັບຄືນ</a>
+  <a class="btn ghost" href="<?= url('student') ?>">‹ ກັບຄືນ</a>
 </div>
 
-<form method="post" action="evaluate.php?plan=<?= $planId ?>" data-plan="<?= $planId ?>">
+<form method="post" action="<?= url('student/eval') ?>?plan=<?= $planId ?>" data-plan="<?= $planId ?>">
   <input type="hidden" name="plan" value="<?= $planId ?>">
 
   <div class="card">

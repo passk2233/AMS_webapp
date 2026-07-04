@@ -4,7 +4,7 @@ require_admin();
 
 $planId = (int) ($_GET['plan'] ?? 0);
 if ($planId <= 0) {
-    header('Location: admin.php');
+    header('Location: ' . url('admin'));
     exit;
 }
 

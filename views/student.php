@@ -8,7 +8,7 @@ require __DIR__ . '/layout/header.php';
 <?php endif; ?>
 
 <div class="actions" style="margin-bottom:8px;">
-  <a class="btn ghost" href="guide.php">📖 ເບິ່ງຄູ່ມືການໃຊ້</a>
+  <a class="btn ghost" href="<?= url('student/guide') ?>">📖 ເບິ່ງຄູ່ມືການໃຊ້</a>
 </div>
 
 <?php
@@ -28,7 +28,7 @@ require __DIR__ . '/layout/header.php';
     <div class="state-icon warn" aria-hidden="true"><?= $icon('user') ?></div>
     <div class="state-title">ບັນຊີນັກສຶກສາຍັງບໍ່ໄດ້ເຊື່ອມຕໍ່ຂໍ້ມູນ</div>
     <p class="state-sub">ກະລຸນາລອງໃໝ່ ຫຼື ຕິດຕໍ່ຫ້ອງທະບຽນ ຖ້າຍັງເຫັນຂໍ້ຄວາມນີ້</p>
-    <a class="btn ghost" href="student.php">ລອງໃໝ່</a>
+    <a class="btn ghost" href="<?= url('student') ?>">ລອງໃໝ່</a>
   </div>
 <?php elseif ($status === 'closed'): ?>
   <div class="state">
@@ -41,7 +41,7 @@ require __DIR__ . '/layout/header.php';
     <div class="state-icon danger" aria-hidden="true"><?= $icon('alert') ?></div>
     <div class="state-title">ໂຫຼດຂໍ້ມູນບໍ່ໄດ້</div>
     <p class="state-sub">ການເຊື່ອມຕໍ່ມີບັນຫາ ກະລຸນາລອງໃໝ່ອີກຄັ້ງ</p>
-    <a class="btn" href="student.php">ລອງໃໝ່</a>
+    <a class="btn" href="<?= url('student') ?>">ລອງໃໝ່</a>
   </div>
 <?php elseif (count($targets) === 0): ?>
   <div class="state">
@@ -68,7 +68,7 @@ require __DIR__ . '/layout/header.php';
         <span class="chip">✓ ປະເມີນແລ້ວ</span>
       </div>
     <?php else: ?>
-      <a class="row" href="guide.php?plan=<?= $t['id'] ?>">
+      <a class="row" href="<?= url('student/guide') ?>?plan=<?= $t['id'] ?>">
         <div class="avatar" aria-hidden="true"><?= esc(mb_strtoupper(mb_substr((string) $t['subject'], 0, 1, 'UTF-8'), 'UTF-8')) ?></div>
         <div class="grow">
           <div class="title"><?= esc($t['subject']) ?></div>

@@ -74,7 +74,7 @@ function api(string $method, string $path, ?array $body = null, bool $auth = tru
     // output, so the redirect header is always safe to send.
     if ($code === 401 && $auth && !empty($_SESSION['token'])) {
         session_unset();
-        header('Location: login.php?expired=1');
+        header('Location: ' . url('login?expired=1'));
         exit;
     }
 
@@ -179,7 +179,7 @@ function api_multi_get(array $paths, ?array &$status = null): array
     // Dead session token → bounce to login, same as api()'s 401 handling.
     if (!empty($_SESSION['token']) && in_array(401, $status, true)) {
         session_unset();
-        header('Location: login.php?expired=1');
+        header('Location: ' . url('login?expired=1'));
         exit;
     }
     return $out;

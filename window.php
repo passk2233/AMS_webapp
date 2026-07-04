@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ? ($visible ? 'ເປີດເຜີຍຜົນໃຫ້ອາຈານແລ້ວ' : 'ປິດການເຜີຍຜົນຈາກອາຈານແລ້ວ')
             : 'ບັນທຶກການຕັ້ງຄ່າບໍ່ສຳເລັດ (' . (int) $res['status'] . ')';
     }
-    header('Location: window.php');
+    header('Location: ' . url('admin/window'));
     exit;
 }
 

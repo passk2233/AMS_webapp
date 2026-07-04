@@ -7,5 +7,5 @@ if (!empty($_SESSION['token'])) {
 }
 session_unset();
 session_destroy();
-header('Location: login.php');
+header('Location: ' . url('login'));
 exit;
