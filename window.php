@@ -47,6 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? 'ປິດການປະເມີນແລ້ວ'
                 : 'ປິດການປະເມີນບໍ່ສຳເລັດ (' . (int) $res['status'] . ')';
         }
+    } elseif ($action === 'visibility') {
+        // Admin gate: whether teachers may see their own results. Same
+        // /eval-settings endpoint the mobile admin switch uses.
+        $visible = (int) ($_POST['visible'] ?? 0) === 1;
+        $res     = api('PUT', '/eval-settings', [
+            'teacher_results_visible' => $visible,
+        ]);
+        $_SESSION['flash'] = $res['ok']
+            ? ($visible ? 'ເປີດເຜີຍຜົນໃຫ້ອາຈານແລ້ວ' : 'ປິດການເຜີຍຜົນຈາກອາຈານແລ້ວ')
+            : 'ບັນທຶກການຕັ້ງຄ່າບໍ່ສຳເລັດ (' . (int) $res['status'] . ')';
     }
     header('Location: window.php');
     exit;
@@ -66,6 +76,11 @@ $isOpen = $current
     && (int) ($current['inactive'] ?? 0) === 0
     && (empty($current['open_time']) || strtotime($current['open_time']) <= $now)
     && (empty($current['close_time']) || strtotime($current['close_time']) >= $now);
+
+// Teacher-visibility gate (fails closed on API error, matching the backend).
+$resVis         = api('GET', '/eval-settings');
+$teacherVisible = $resVis['ok']
+    && !empty($resVis['data']['teacher_results_visible']);
 
 $title = 'ໄລຍະການປະເມີນ';
 require __DIR__ . '/views/window.php';

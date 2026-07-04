@@ -4,13 +4,13 @@ require __DIR__ . '/config.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $u = trim((string) ($_POST['email'] ?? ''));
+    $u = trim((string) ($_POST['username'] ?? ''));
     $p = (string) ($_POST['password'] ?? '');
     if ($u === '' || $p === '') {
-        $error = 'ກະລຸນາປ້ອນອີເມວ ແລະ ລະຫັດຜ່ານ';
+        $error = 'ກະລຸນາປ້ອນຊື່ຜູ້ໃຊ້ ແລະ ລະຫັດຜ່ານ';
     } else {
         $r = api('POST', '/auth/login', [
-            'email'        => $u,
+            'username'     => $u,
             'password'     => $p,
             'platform'     => 'web',
             'device_token' => null,
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_unset();
             $error = 'ບັນຊີນີ້ບໍ່ສາມາດໃຊ້ໃນລະບົບປະເມີນ';
         } elseif ($r['status'] === 401) {
-            $error = 'ອີເມວ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
+            $error = 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ';
         } else {
             $error = 'ເຊື່ອມຕໍ່ເຊີບເວີບໍ່ໄດ້ ກະລຸນາລອງໃໝ່';
         }

@@ -25,9 +25,9 @@
     <p class="muted">AMS_UP — ເຂົ້າສູ່ລະບົບ</p>
 
     <label class="field">
-      <span>ອີເມວ</span>
-      <input class="input" type="email" name="email" autofocus autocomplete="email"
-             inputmode="email" value="<?= esc($_POST['email'] ?? '') ?>">
+      <span>ຊື່ຜູ້ໃຊ້ (ລະຫັດນັກສຶກສາ/ອາຈານ)</span>
+      <input class="input" type="text" name="username" autofocus autocomplete="username"
+             value="<?= esc($_POST['username'] ?? '') ?>">
     </label>
     <label class="field">
       <span>ລະຫັດຜ່ານ</span>

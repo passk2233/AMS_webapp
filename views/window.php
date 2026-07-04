@@ -1,5 +1,5 @@
 <?php
-/** @var ?string $flash @var bool $error @var array $windows @var ?array $current @var bool $isOpen @var string $title */
+/** @var ?string $flash @var bool $error @var array $windows @var ?array $current @var bool $isOpen @var bool $teacherVisible @var string $title */
 require __DIR__ . '/layout/header.php';
 
 $fmt = fn (?string $t): string => $t ? date('d/m/Y H:i', strtotime($t)) : '-';
@@ -28,6 +28,25 @@ $fmt = fn (?string $t): string => $t ? date('d/m/Y H:i', strtotime($t)) : '-';
       </form>
     <?php else: ?>
       <p><strong style="color:var(--danger);">● ປິດຢູ່</strong> — ນັກສຶກສາຍັງເຂົ້າປະເມີນບໍ່ໄດ້</p>
+    <?php endif; ?>
+  </div>
+
+  <h2>ການເຜີຍຜົນໃຫ້ອາຈານ</h2>
+  <div class="card">
+    <?php if ($teacherVisible): ?>
+      <p><strong style="color:#0c7a3c;">● ເປີດເຜີຍຢູ່</strong> — ອາຈານເຫັນຜົນການປະເມີນຂອງຕົນເອງໄດ້</p>
+      <form method="post" action="window.php" onsubmit="return confirm('ປິດການເຜີຍຜົນຈາກອາຈານແທ້ບໍ?');">
+        <input type="hidden" name="action" value="visibility">
+        <input type="hidden" name="visible" value="0">
+        <button class="btn danger" type="submit">ປິດການເຜີຍຜົນ</button>
+      </form>
+    <?php else: ?>
+      <p><strong style="color:var(--danger);">● ປິດຢູ່</strong> — ອາຈານຍັງເບິ່ງຜົນການປະເມີນບໍ່ໄດ້</p>
+      <form method="post" action="window.php">
+        <input type="hidden" name="action" value="visibility">
+        <input type="hidden" name="visible" value="1">
+        <button class="btn" type="submit">ເປີດເຜີຍຜົນໃຫ້ອາຈານ</button>
+      </form>
     <?php endif; ?>
   </div>
 
