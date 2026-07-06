@@ -1,11 +1,21 @@
 <?php
 require __DIR__ . '/config.php';
-require_admin();
+require_login();
 
 $planId = (int) ($_GET['plan'] ?? 0);
 if ($planId <= 0) {
-    header('Location: ' . url('admin'));
+    header('Location: ' . url(home_path()));
     exit;
+}
+
+// Admins see any plan; a teacher may only open a plan they own. Anyone else is
+// bounced. The teacher's plan set is the same list their dashboard is built from.
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    $ownIds = array_map(fn ($p) => (int) ($p['id'] ?? 0), teacher_plans((int) ($_SESSION['teacher_id'] ?? 0)));
+    if (($_SESSION['role'] ?? '') !== 'teacher' || !in_array($planId, $ownIds, true)) {
+        header('Location: ' . url('login'));
+        exit;
+    }
 }
 
 // Every page: a large class can exceed the API's 200-row page cap, which would

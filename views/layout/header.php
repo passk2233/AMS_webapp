@@ -12,19 +12,22 @@
 <link rel="stylesheet" href="<?= url('assets/style.css') ?>?v=<?= @filemtime(__DIR__ . '/../../assets/style.css') ?: '1' ?>">
 </head>
 <body>
-<?php $home = url((($_SESSION['role'] ?? '') === 'admin') ? 'admin' : 'student'); ?>
+<?php $role = $_SESSION['role'] ?? ''; $home = url(home_path()); ?>
 <header class="topbar">
   <div class="topbar-in">
     <a class="brand" href="<?= $home ?>">ການປະເມີນອາຈານ</a>
     <nav>
-      <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+      <?php if ($role === 'admin'): ?>
         <a href="<?= url('admin') ?>">ຜົນການປະເມີນ</a>
         <a href="<?= url('admin/questions') ?>">ຄຳຖາມ</a>
         <a href="<?= url('admin/window') ?>">ໄລຍະປະເມີນ</a>
+      <?php elseif ($role === 'teacher'): ?>
+        <a href="<?= url('teacher') ?>">ຜົນການປະເມີນຂອງຂ້ອຍ</a>
       <?php else: ?>
         <a href="<?= url('student') ?>">ວິຊາ</a>
         <a href="<?= url('student/guide') ?>">ຄູ່ມືການໃຊ້</a>
       <?php endif; ?>
+      <a href="<?= url('rooms') ?>">ການໃຊ້ຫ້ອງ</a>
       <a href="<?= url('logout') ?>" class="logout">ອອກຈາກລະບົບ</a>
     </nav>
   </div>

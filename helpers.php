@@ -18,6 +18,17 @@ function url(string $path = ''): string
     return $base . '/' . ltrim($path, '/');
 }
 
+/** Landing route for the current session's role: admin → admin dashboard,
+ *  teacher → their own results, everyone else → the student page. */
+function home_path(): string
+{
+    switch ($_SESSION['role'] ?? '') {
+        case 'admin':   return 'admin';
+        case 'teacher': return 'teacher';
+        default:        return 'student';
+    }
+}
+
 /** Read a one-shot flash message (set after a PRG redirect) and clear it. */
 function flash_take(): ?string
 {

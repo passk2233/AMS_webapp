@@ -22,6 +22,9 @@ $routes = [
     'admin/report-bulk' => 'report_bulk.php',
     'admin/questions'   => 'questions.php',
     'admin/window'      => 'window.php',
+    'teacher'           => 'teacher.php',
+    'report'            => 'report.php',   // shared: admin + owning teacher (report.php gates)
+    'rooms'             => 'rooms.php',     // room-usage viewer, any logged-in user
 ];
 
 // Strip the mount folder (e.g. /webapp) so routes match at any depth.
@@ -48,9 +51,7 @@ if ($path !== '') {
 // Home: send to the role's landing page.
 if (empty($_SESSION['token'])) {
     header('Location: ' . url('login'));
-} elseif (($_SESSION['role'] ?? '') === 'admin') {
-    header('Location: ' . url('admin'));
 } else {
-    header('Location: ' . url('student'));
+    header('Location: ' . url(home_path()));
 }
 exit;

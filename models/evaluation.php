@@ -91,6 +91,16 @@ function study_plans(?int $semesterId, ?int $groupId): array
     return api_list(cached_get('/study-plans?' . $q, 600));
 }
 
+/** A teacher's own study plans (all semesters), flat rows like study_plans().
+ *  Reads /study-plans/teacher/{id}; empty for an unknown/zero id. */
+function teacher_plans(int $teacherId): array
+{
+    if ($teacherId <= 0) {
+        return [];
+    }
+    return api_list(cached_get('/study-plans/teacher/' . $teacherId, 600));
+}
+
 function positive_int_or_null($value): ?int
 {
     if (is_int($value)) {

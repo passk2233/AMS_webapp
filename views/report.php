@@ -3,7 +3,7 @@
 require __DIR__ . '/layout/header.php';
 ?>
 <div class="actions">
-  <a class="btn ghost" href="<?= url('admin') ?>">‹ ກັບຄືນ</a>
+  <a class="btn ghost" href="<?= url(home_path()) ?>">‹ ກັບຄືນ</a>
   <?php if ($report): ?><button class="btn" id="dl-pdf" type="button" data-busy="ກຳລັງສ້າງ PDF...">ດາວໂຫຼດ PDF</button><?php endif; ?>
 </div>
 

@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_regenerate_id(true); // fresh id on login → defeats session fixation
             $_SESSION['token'] = $r['data']['token'];
             if (load_me()) {
-                header('Location: ' . url($_SESSION['role'] === 'admin' ? 'admin' : 'student'));
+                header('Location: ' . url(home_path()));
                 exit;
             }
             // Authenticated but not a usable role for this app.
