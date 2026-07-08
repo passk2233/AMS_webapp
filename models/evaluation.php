@@ -33,6 +33,22 @@ function active_semester(): ?array
     return $sem = $all[0];
 }
 
+/** Is the evaluation window open right now? Mirrors student.php's gate: an
+ *  active (inactive=0) window row must exist. Fails closed on API error. */
+function eval_window_open(): bool
+{
+    $res = api('GET', '/open-evalu?inactive=0&limit=1');
+    return $res['ok'] && count(api_list($res['data'])) > 0;
+}
+
+/** Admin gate: may teachers see their own results? Same /eval-settings switch
+ *  the admin window screen sets. Fails closed on API error, matching the backend. */
+function teacher_results_visible(): bool
+{
+    $res = api('GET', '/eval-settings');
+    return $res['ok'] && !empty($res['data']['teacher_results_visible']);
+}
+
 /** All semesters, newest first (for the admin semester filter). Cached per request. */
 function semesters(): array
 {

@@ -1,6 +1,6 @@
 <?php
 /** @var bool $error @var array $bySubject @var array $semesters
- *  @var int $selectedSemId @var string $title */
+ *  @var int $selectedSemId @var bool $resultsVisible @var string $title */
 require __DIR__ . '/layout/header.php';
 ?>
 <style>
@@ -26,7 +26,9 @@ require __DIR__ . '/layout/header.php';
   </form>
 <?php endif; ?>
 
-<?php if ($error): ?>
+<?php if (!$resultsVisible): ?>
+  <div class="state">ຜົນການປະເມີນຍັງບໍ່ທັນເປີດເຜີຍ ກະລຸນາລໍຖ້າຜູ້ດູແລລະບົບ</div>
+<?php elseif ($error): ?>
   <div class="state">ໂຫຼດຜົນການປະເມີນບໍ່ໄດ້ ກະລຸນາລອງໃໝ່</div>
 <?php elseif (count($bySubject) === 0): ?>
   <div class="state">ຍັງບໍ່ມີວິຊາ ຫຼື ຜົນການປະເມີນ</div>

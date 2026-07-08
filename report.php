@@ -16,6 +16,12 @@ if (($_SESSION['role'] ?? '') !== 'admin') {
         header('Location: ' . url('login'));
         exit;
     }
+    // Same admin gate as the teacher dashboard: no direct-link bypass to a
+    // plan's detail while results are unreleased.
+    if (!teacher_results_visible()) {
+        header('Location: ' . url('teacher'));
+        exit;
+    }
 }
 
 // Every page: a large class can exceed the API's 200-row page cap, which would

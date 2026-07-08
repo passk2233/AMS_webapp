@@ -21,6 +21,13 @@ if ($studentId <= 0) {
     }
 }
 
+// Honor the admin open/close gate on both the form and the submit — a student
+// with a stale link can't post to a closed window. student.php shows "closed".
+if (!eval_window_open()) {
+    header('Location: ' . url('student'));
+    exit;
+}
+
 $questions = api_list(cached_get('/evaluation-questions?is_active=1', 86400));
 
 // Plan header info (best-effort) — fetched up front so it's available for the

@@ -16,6 +16,9 @@ $semesters = semesters();
 // so narrowing is opt-in (0 = all) rather than a default that could hide plans.
 $selectedSemId = (int) ($_GET['semester'] ?? 0);
 
+// Admin gate: teachers only see results once the admin releases them.
+$resultsVisible = teacher_results_visible();
+
 $groups   = group_index();
 $allPlans = teacher_plans($teacherId);
 
@@ -34,13 +37,13 @@ foreach ($plans as $p) {
 
 $planIds = array_values(array_filter(array_keys($planMap), fn ($id) => $id > 0));
 $ok      = true;
-$allRows = $planIds
+$allRows = ($resultsVisible && $planIds)
     ? api_get_all('/evaluation-results?study_plan_ids=' . implode(',', $planIds), $ok)
     : [];
 $error   = !$ok;
 
 $reports = [];
-if (!$error) {
+if (!$error && $resultsVisible) {
     $reportMap = [];
     foreach (reports_from_rows($allRows, $planMap) as $report) {
         $reportMap[(int) $report['plan_id']] = $report;
@@ -71,4 +74,5 @@ foreach ($reports as $report) {
 ksort($bySubject, SORT_NATURAL | SORT_FLAG_CASE);
 
 $title = 'ຜົນການປະເມີນຂອງຂ້ອຍ';
+// $resultsVisible tells the view to show "not released yet" vs "no data".
 require __DIR__ . '/views/teacher.php';
