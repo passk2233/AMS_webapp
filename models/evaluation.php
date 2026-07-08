@@ -33,12 +33,24 @@ function active_semester(): ?array
     return $sem = $all[0];
 }
 
-/** Is the evaluation window open right now? Mirrors student.php's gate: an
- *  active (inactive=0) window row must exist. Fails closed on API error. */
+/** Is the evaluation window open right now? Authoritative definition, same as
+ *  the admin window screen ($isOpen): the newest window must be active AND the
+ *  clock must be within [open_time, close_time]. Checking the time here — not
+ *  just inactive=0 — is what keeps a student out once close_time passes even if
+ *  the admin never clicked "close". Fails closed on API error. */
 function eval_window_open(): bool
 {
-    $res = api('GET', '/open-evalu?inactive=0&limit=1');
-    return $res['ok'] && count(api_list($res['data'])) > 0;
+    $res = api('GET', '/open-evalu?limit=1');
+    if (!$res['ok']) {
+        return false;
+    }
+    $w = api_list($res['data'])[0] ?? null;
+    if (!$w || (int) ($w['inactive'] ?? 0) !== 0) {
+        return false;
+    }
+    $now = time();
+    return (empty($w['open_time'])  || strtotime((string) $w['open_time'])  <= $now)
+        && (empty($w['close_time']) || strtotime((string) $w['close_time']) >= $now);
 }
 
 /** Admin gate: may teachers see their own results? Same /eval-settings switch

@@ -27,12 +27,21 @@ if (!$studentId || !$groupId) {
     // live so a just-submitted evaluation flips to "done" on the next load).
     $minePath = '/evaluation-results?student_id=' . (int) $studentId . '&limit=200';
     $batch    = api_multi_get([
-        'win'  => '/open-evalu?inactive=0&limit=1',
+        'win'  => '/open-evalu?limit=1',
         'mine' => $minePath . '&page=1',
     ], $st);
+    // Open only if the newest window is active AND now is within its time
+    // bounds — the same $isOpen the admin screen uses. Checking the clock (not
+    // just inactive=0) is what closes evaluation once close_time passes.
+    $win = api_list($batch['win'])[0] ?? null;
+    $now = time();
+    $winOpen = $win
+        && (int) ($win['inactive'] ?? 0) === 0
+        && (empty($win['open_time'])  || strtotime((string) $win['open_time'])  <= $now)
+        && (empty($win['close_time']) || strtotime((string) $win['close_time']) >= $now);
     if (($st['win'] ?? 0) < 200 || ($st['win'] ?? 0) >= 300) {
         $status = 'error';
-    } elseif (count(api_list($batch['win'])) === 0) {
+    } elseif (!$winOpen) {
         $status = 'closed';
     } else {
         $questions = api_list(cached_get('/evaluation-questions?is_active=1', 86400));
